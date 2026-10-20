@@ -58,6 +58,8 @@ data class SmartIslandSettings(
     val lockScreenPrivacy: String = "AppIconOnly",
     val showNotificationActions: Boolean = true,
     val hideFromNotificationShade: Boolean = true,
+    /** When true the listener ignores every post/removal so system notifications reach the shade, sound and wearables untouched. */
+    val isNotificationInterceptDisabled: Boolean = false,
     val liveActivitiesEnabled: Boolean = true,
     val navigationEnabled: Boolean = true,
     val disabledNotificationPackages: Set<String> = emptySet(),
@@ -462,6 +464,7 @@ data class SmartIslandSettings(
         settingsObj.put("lockScreenPrivacy", lockScreenPrivacy)
         settingsObj.put("showNotificationActions", showNotificationActions)
         settingsObj.put("hideFromNotificationShade", hideFromNotificationShade)
+        settingsObj.put("isNotificationInterceptDisabled", isNotificationInterceptDisabled)
         settingsObj.put("liveActivitiesEnabled", liveActivitiesEnabled)
         settingsObj.put("navigationEnabled", navigationEnabled)
 
@@ -909,6 +912,7 @@ data class SmartIslandSettings(
                 },
                 showNotificationActions = obj.optBoolean("showNotificationActions", defaults.showNotificationActions),
                 hideFromNotificationShade = obj.optBoolean("hideFromNotificationShade", defaults.hideFromNotificationShade),
+                isNotificationInterceptDisabled = obj.optBoolean("isNotificationInterceptDisabled", defaults.isNotificationInterceptDisabled),
                 liveActivitiesEnabled = obj.optBoolean("liveActivitiesEnabled", defaults.liveActivitiesEnabled),
                 navigationEnabled = obj.optBoolean("navigationEnabled", defaults.navigationEnabled),
                 disabledNotificationPackages = safeStringSet("disabledNotificationPackages", defaults.disabledNotificationPackages),

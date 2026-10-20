@@ -75,6 +75,7 @@ class SmartIslandSettingsRepository(private val context: Context) {
         val LockScreenPrivacy = stringPreferencesKey("lock_screen_privacy")
         val ShowNotificationActions = booleanPreferencesKey("show_notification_actions")
         val HideFromNotificationShade = booleanPreferencesKey("hide_from_notification_shade")
+        val NotificationInterceptDisabled = booleanPreferencesKey("notification_intercept_disabled")
         val LiveActivitiesEnabled = booleanPreferencesKey("live_activities_enabled")
         val NavigationEnabled = booleanPreferencesKey("navigation_enabled")
         val DisabledNotificationPackages = stringSetPreferencesKey("disabled_notification_packages")
@@ -356,6 +357,8 @@ class SmartIslandSettingsRepository(private val context: Context) {
                     ?: defaults.showNotificationActions,
                 hideFromNotificationShade = prefs[Keys.HideFromNotificationShade]
                     ?: defaults.hideFromNotificationShade,
+                isNotificationInterceptDisabled = prefs[Keys.NotificationInterceptDisabled]
+                    ?: defaults.isNotificationInterceptDisabled,
                 liveActivitiesEnabled = prefs[Keys.LiveActivitiesEnabled]
                     ?: defaults.liveActivitiesEnabled,
                 navigationEnabled = prefs[Keys.NavigationEnabled]
@@ -854,6 +857,9 @@ class SmartIslandSettingsRepository(private val context: Context) {
     }
     suspend fun setShowNotificationActions(value: Boolean) = editSafely {
         it[Keys.ShowNotificationActions] = value
+    }
+    suspend fun setNotificationInterceptDisabled(value: Boolean) = editSafely {
+        it[Keys.NotificationInterceptDisabled] = value
     }
     suspend fun setHideFromNotificationShade(value: Boolean) = editSafely {
         it[Keys.HideFromNotificationShade] = value
@@ -1447,6 +1453,7 @@ class SmartIslandSettingsRepository(private val context: Context) {
             ?: SmartIslandSettings.Default.lockScreenPrivacy
         prefs[Keys.ShowNotificationActions] = settings.showNotificationActions
         prefs[Keys.HideFromNotificationShade] = settings.hideFromNotificationShade
+        prefs[Keys.NotificationInterceptDisabled] = settings.isNotificationInterceptDisabled
         prefs[Keys.LiveActivitiesEnabled] = settings.liveActivitiesEnabled
         prefs[Keys.NavigationEnabled] = settings.navigationEnabled
         prefs[Keys.DisabledNotificationPackages] = settings.disabledNotificationPackages

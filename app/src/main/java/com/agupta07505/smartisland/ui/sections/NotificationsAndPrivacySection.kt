@@ -542,6 +542,16 @@ fun NotificationsAndPrivacySection(
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
 
                 ToggleRowItem(
+                    searchKey = "np.intercept_disabled",
+                    title = stringResource(R.string.toggle_intercept_disabled_title),
+                    subtitle = stringResource(R.string.toggle_intercept_disabled_desc),
+                    icon = Icons.Rounded.VisibilityOff,
+                    checked = settings.isNotificationInterceptDisabled,
+                    onCheckedChange = { scope.launch { repository.setNotificationInterceptDisabled(it) } }
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+
+                ToggleRowItem(
                     searchKey = "np.mirror_only",
                     title = stringResource(R.string.toggle_mirror_only_title),
                     subtitle = stringResource(R.string.toggle_mirror_only_desc),

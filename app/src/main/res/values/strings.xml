@@ -328,6 +328,8 @@
     <string name="toggle_quick_actions_desc">Show actionable buttons like Reply, Mark Read, and Dismiss in expanded card</string>
     <string name="toggle_mirror_only_title">Mirror Only (Hide from System Shade)</string>
     <string name="toggle_mirror_only_desc">Show notification only in Smart Island and hide from default notification shade</string>
+    <string name="toggle_intercept_disabled_title">Don\'t Intercept Notifications</string>
+    <string name="toggle_intercept_disabled_desc">Leave all system notifications untouched so sound, vibration, status bar icons and smartwatch sync keep working. The island stays on screen.</string>
     <string name="toggle_auto_hide_idle_title">Auto-Hide Pill When Idle</string>
     <string name="toggle_auto_hide_idle_desc">Hide the pill completely when there are no active alerts, music, or dynamic events</string>
     <string name="toggle_auto_hide_pill_title">Auto-Hide Pill After Inactivity</string>
