@@ -307,6 +307,14 @@ fun NotificationsAndPrivacySection(
                     checked = settings.notificationsEnabled,
                     onCheckedChange = { scope.launch { repository.setNotificationsEnabled(it) } }
                 )
+                ToggleRowItem(
+                    searchKey = "np.intercept_disabled",
+                    title = stringResource(R.string.toggle_intercept_disabled_title),
+                    subtitle = stringResource(R.string.toggle_intercept_disabled_desc),
+                    icon = Icons.Rounded.VisibilityOff,
+                    checked = settings.isNotificationInterceptDisabled,
+                    onCheckedChange = { scope.launch { repository.setNotificationInterceptDisabled(it) } }
+                )
                 if (!settings.notificationsEnabled) {
                     Text(
                         text = stringResource(R.string.notifications_master_off_note),
@@ -538,16 +546,6 @@ fun NotificationsAndPrivacySection(
                     icon = Icons.Rounded.TouchApp,
                     checked = settings.showNotificationActions,
                     onCheckedChange = { scope.launch { repository.setShowNotificationActions(it) } }
-                )
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
-
-                ToggleRowItem(
-                    searchKey = "np.intercept_disabled",
-                    title = stringResource(R.string.toggle_intercept_disabled_title),
-                    subtitle = stringResource(R.string.toggle_intercept_disabled_desc),
-                    icon = Icons.Rounded.VisibilityOff,
-                    checked = settings.isNotificationInterceptDisabled,
-                    onCheckedChange = { scope.launch { repository.setNotificationInterceptDisabled(it) } }
                 )
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
 

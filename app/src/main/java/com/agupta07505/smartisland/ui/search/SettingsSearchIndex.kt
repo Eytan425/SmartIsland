@@ -236,6 +236,10 @@ internal fun buildSettingsSearchIndex(str: (Int) -> String): List<SettingsSearch
         listOf("buttons", "reply", "actions", "inline")
     )
     npToggle(
+        "intercept_disabled", R.string.toggle_intercept_disabled_title, R.string.toggle_intercept_disabled_desc,
+        listOf("intercept", "swallow", "vibrate", "buzz", "sound", "watch", "smartwatch", "bluetooth", "status bar", "pass through")
+    )
+    npToggle(
         "mirror_only", R.string.toggle_mirror_only_title, R.string.toggle_mirror_only_desc,
         listOf("shade", "status bar", "remove", "hide notification", "drawer")
     )
