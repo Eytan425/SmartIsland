@@ -75,6 +75,13 @@ class SmartIslandNotificationListenerService : NotificationListenerService() {
     /** User opt-out: never touch system notifications (no cancel, no island card). The overlay itself stays running. */
     private val isNotificationInterceptDisabled: Boolean
         get() = currentSettings.isNotificationInterceptDisabled
+
+    private fun isPlainNotification(sbn: StatusBarNotification): Boolean = sbn.notification.toIslandMode(
+        sbn,
+        currentSettings.liveActivitiesEnabled,
+        currentSettings.navigationEnabled,
+        currentSettings.deviceType
+    ) == IslandMode.Notification
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, error ->
         android.util.Log.e(TAG, "Unhandled notification-listener coroutine failure", error)
     }
@@ -503,8 +510,8 @@ class SmartIslandNotificationListenerService : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification, rankingMap: RankingMap?) {
-        if (isNotificationInterceptDisabled) {
-            return // Immediately exit to let Android pass the system notification smoothly to System UI and Bluetooth peripherals
+        if (isNotificationInterceptDisabled && isPlainNotification(sbn)) {
+            return // Leave plain notifications to System UI and Bluetooth peripherals; calls, media, timers etc. still reach the island
         }
         runCatchingLogged(TAG, "onNotificationPosted callback failed") {
         if (sbn.packageName == packageName) return@runCatchingLogged
@@ -539,6 +546,7 @@ class SmartIslandNotificationListenerService : NotificationListenerService() {
         try {
             if (currentSettings.enabled &&
                 currentSettings.hideFromNotificationShade &&
+                !isNotificationInterceptDisabled &&
                 !shouldSuppressFromIsland(sbn, rankingMap)
             ) {
                 val modeQuick = notification.toIslandMode(
@@ -591,9 +599,6 @@ class SmartIslandNotificationListenerService : NotificationListenerService() {
      * any other reason removes the card and the key.
      */
     override fun onNotificationRemoved(sbn: StatusBarNotification, rankingMap: RankingMap?, reason: Int) {
-        if (isNotificationInterceptDisabled) {
-            return // Immediately exit to let Android pass the system notification smoothly to System UI and Bluetooth peripherals
-        }
         runCatchingLogged(TAG, "onNotificationRemoved callback failed") {
         android.util.Log.d(TAG, "onNotificationRemoved: key=${sbn.key} pkg=${sbn.packageName} reason=$reason")
         scheduleCountRefresh()
@@ -667,9 +672,6 @@ class SmartIslandNotificationListenerService : NotificationListenerService() {
 
     // Keep the no-arg override as a fallback (some OEMs may only call this one).
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        if (isNotificationInterceptDisabled) {
-            return // Immediately exit to let Android pass the system notification smoothly to System UI and Bluetooth peripherals
-        }
         runCatchingLogged(TAG, "onNotificationRemoved fallback callback failed") {
         android.util.Log.d(TAG, "onNotificationRemoved (no reason): key=${sbn.key} pkg=${sbn.packageName}")
         scheduleCountRefresh()
@@ -768,7 +770,7 @@ class SmartIslandNotificationListenerService : NotificationListenerService() {
             if (!isPersistentIslandMode(mode) && !isLoudNotification) {
                 return@forEach
             }
-            if (settings.isNotificationInterceptDisabled) return@forEach
+            if (settings.isNotificationInterceptDisabled && mode == IslandMode.Notification) return@forEach
             if (settings.hideFromNotificationShade &&
                 shouldHideFromShade(sbn.notification, mode, sbn.packageName)
             ) {
@@ -999,6 +1001,10 @@ class SmartIslandNotificationListenerService : NotificationListenerService() {
             settings.deviceType
         )
         android.util.Log.d(TAG, "handleNotificationPosted: mode=$mode key=${sbn.key} title=${extras.getCharSequence(Notification.EXTRA_TITLE)}")
+        if (settings.isNotificationInterceptDisabled && mode == IslandMode.Notification) {
+            traceStage(sbn, "DROPPED", "stage=handle reason=intercept-disabled")
+            return
+        }
 
         // Quiet imports of what is already in the shade are not new alerts, so they neither count
         // towards the spam threshold nor get buffered.
@@ -1018,6 +1024,7 @@ class SmartIslandNotificationListenerService : NotificationListenerService() {
         val shouldIslandOnly = shouldBeIslandOnly(notification, mode)
 
         val removedFromShade = settings.hideFromNotificationShade &&
+            !settings.isNotificationInterceptDisabled &&
             shouldIslandOnly &&
             shouldHideFromShade(notification, mode, sbn.packageName)
         if (removedFromShade) {

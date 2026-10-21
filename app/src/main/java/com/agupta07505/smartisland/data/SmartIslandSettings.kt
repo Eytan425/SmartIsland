@@ -58,7 +58,7 @@ data class SmartIslandSettings(
     val lockScreenPrivacy: String = "AppIconOnly",
     val showNotificationActions: Boolean = true,
     val hideFromNotificationShade: Boolean = true,
-    /** When true the listener ignores every post/removal so system notifications reach the shade, sound and wearables untouched. */
+    /** When true plain notifications are left to the system (shade, sound, wearables) and nothing is ever cancelled; calls, media, timers etc. still show on the island. */
     val isNotificationInterceptDisabled: Boolean = false,
     val liveActivitiesEnabled: Boolean = true,
     val navigationEnabled: Boolean = true,
