@@ -55,6 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: notify-telegram
     timeout-minutes: 30
+    outputs:
+      apk_name: ${{ steps.apk_name.outputs.name }}
 
     steps:
       - name: Check out repository
@@ -82,11 +84,19 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Give the debug APK a unique name
+        id: apk_name
+        run: |
+          version=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
+          name="SmartIsland-v${version}-build${GITHUB_RUN_NUMBER}-$(date -u +%Y%m%d-%H%M)-${GITHUB_SHA::7}"
+          cp app/build/outputs/apk/debug/app-debug.apk "$name.apk"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: SmartIsland-Debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: ${{ steps.apk_name.outputs.name }}
+          path: ${{ steps.apk_name.outputs.name }}.apk
           if-no-files-found: error
           retention-days: 14
 
@@ -103,7 +113,7 @@ jobs:
       - name: Download debug APK
         uses: actions/download-artifact@v4
         with:
-          name: SmartIsland-Debug-apk
+          name: ${{ needs.build.outputs.apk_name }}
 
       - name: Send to Telegram
         env:
@@ -113,4 +123,4 @@ jobs:
           TELEGRAM_DEBUG_TOPIC_ID: ${{ secrets.TELEGRAM_DEBUG_TOPIC_ID }}
         run: |
           chmod +x ./scripts/send-telegram.sh
-          ./scripts/send-telegram.sh "app-debug.apk" "Debug"
+          ./scripts/send-telegram.sh "${{ needs.build.outputs.apk_name }}.apk" "Debug"
