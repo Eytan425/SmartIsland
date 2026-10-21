@@ -41,6 +41,13 @@ android {
     }
 
     signingConfigs {
+        // Fixed debug key (public, password "android") so every CI debug APK installs over the previous one.
+        getByName("debug") {
+            storeFile = file("debug-shared.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
         create("release") {
             if (hasReleaseSigning) {
                 storeFile = file(signingStoreFile.get())

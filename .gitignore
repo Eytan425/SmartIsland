@@ -51,3 +51,5 @@ ISLAND_HORIZONTAL_ALIGNMENT_FIX.md
 
 # Scripts
 scripts/
+
+!app/debug-shared.keystore
